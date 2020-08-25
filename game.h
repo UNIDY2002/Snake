@@ -2,6 +2,8 @@
 #define SNAKE_GAME_H
 
 #include <QtWidgets/QWidget>
+#include <QKeyEvent>
+#include <QTimer>
 #include <iostream>
 #include "constants.h"
 #include "ui_game.h"
@@ -31,13 +33,14 @@ private:
     GameState state = {
             /* snake: */ std::list<Point>(),
             /* direction: */ undefined,
+            /* nextDirection: */ undefined,
             /* growth: */ -1,
             /* speed: */ SPEED,
     };
 
-private slots:
+    void keyPressEvent(QKeyEvent *event) override;
 
-    void onTimeout();
+    void move();
 
 };
 

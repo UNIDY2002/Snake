@@ -4,7 +4,7 @@
 #include <list>
 
 enum Direction {
-    W, A, S, D, undefined
+    undefined, W, A, S, D
 };
 
 struct Point {
@@ -14,6 +14,7 @@ struct Point {
 struct GameState {
     std::list<Point> snake;
     Direction direction;
+    Direction nextDirection;
     int growth;
     int speed;
 };

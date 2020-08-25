@@ -1,5 +1,4 @@
 #include <QtGui/QPainter>
-#include <QTimer>
 #include "game.h"
 #include "ui_game.h"
 
@@ -8,9 +7,9 @@ Game::Game(QWidget *parent) : QWidget(parent), ui(new Ui::Game), timer(new QTime
 
     state.snake.push_back({14, 23});
     state.snake.push_back({15, 23});
+    state.direction = D;
 
-    timer->start(state.speed);
-    connect(timer, SIGNAL(timeout()), this, SLOT(onTimeout()));
+    timer->callOnTimeout([&]() { move(); });
 }
 
 Game::~Game() {
@@ -30,9 +29,38 @@ void Game::paintEvent(QPaintEvent *event) {
     }
 }
 
-void Game::onTimeout() {
+void Game::move() {
+    state.direction = state.nextDirection;
     state.snake.erase(state.snake.begin());
     auto beg = state.snake.begin();
-    state.snake.push_back({beg->x, beg->y - 1});
+    state.snake.push_back({beg->x + dx[state.direction], beg->y + dy[state.direction]});
     update();
+}
+
+void Game::keyPressEvent(QKeyEvent *event) {
+    auto key = event->key();
+    auto targetDirection = undefined;
+    switch (key) {
+        case Qt::Key_Up:
+            targetDirection = W;
+            break;
+        case Qt::Key_Left:
+            targetDirection = A;
+            break;
+        case Qt::Key_Down:
+            targetDirection = S;
+            break;
+        case Qt::Key_Right:
+            targetDirection = D;
+            break;
+        default:
+            break;
+    }
+
+    if (targetDirection && (!state.direction || abs(state.direction - targetDirection) != 2)) {
+        state.nextDirection = targetDirection;
+        move();
+        if (!timer->isActive()) timer->start(state.speed);
+        return;
+    }
 }
