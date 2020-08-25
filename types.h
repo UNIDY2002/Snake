@@ -11,7 +11,12 @@ struct Point {
     int x, y;
 };
 
+enum Status {
+    NONE, START, PAUSE, STOP
+};
+
 struct GameState {
+    Status status;
     std::list<Point> snake;
     Direction direction;
     Direction nextDirection;

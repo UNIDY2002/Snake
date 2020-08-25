@@ -31,6 +31,7 @@ private:
     QTimer *timer;
 
     GameState state = {
+            /* status: */ NONE,
             /* snake: */ std::list<Point>(),
             /* direction: */ undefined,
             /* nextDirection: */ undefined,
@@ -41,6 +42,8 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
 
     void move();
+
+    void changeStatus(Status status);
 
 };
 

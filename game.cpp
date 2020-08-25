@@ -53,14 +53,38 @@ void Game::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Right:
             targetDirection = D;
             break;
+        case Qt::Key_P:
+        case Qt::Key_Space:
+            if (state.status == START)
+                changeStatus(PAUSE);
+            else if (state.status == PAUSE)
+                changeStatus(START);
         default:
             break;
     }
 
     if (targetDirection && (!state.direction || abs(state.direction - targetDirection) != 2)) {
         state.nextDirection = targetDirection;
-        move();
-        if (!timer->isActive()) timer->start(state.speed);
+        changeStatus(START);
         return;
+    }
+}
+
+void Game::changeStatus(Status status) {
+    if (status != state.status) {
+        switch (status) {
+            case NONE:
+                break;
+            case START:
+                if (!timer->isActive()) timer->start(state.speed);
+                break;
+            case PAUSE:
+                timer->stop();
+                break;
+            case STOP:
+                timer->stop();
+                break;
+        }
+        state.status = status;
     }
 }
