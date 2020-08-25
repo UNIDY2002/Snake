@@ -25,8 +25,9 @@ void Game::paintEvent(QPaintEvent *event) {
         }
     }
     for (const auto &point:state.snake) {
-        painter.fillRect(QRect(point.x * WIDTH, point.y * HEIGHT, WIDTH, HEIGHT), Qt::green);
+        paintRect(painter, point, Qt::green);
     }
+    paintRect(painter, state.food, Qt::red);
 }
 
 void Game::move() {
@@ -47,8 +48,16 @@ void Game::move() {
     if (!alive) {
         changeStatus(STOP);
     } else {
-        state.snake.erase(--state.snake.end());
+        if (state.growth) {
+            --state.growth;
+        } else {
+            state.snake.erase(--state.snake.end());
+        }
         state.snake.push_front(dest);
+        if (dest == state.food) {
+            state.growth = 3;
+            state.food = randomPoint();
+        }
     }
     update();
 }
@@ -103,5 +112,19 @@ void Game::changeStatus(Status status) {
                 break;
         }
         state.status = status;
+    }
+}
+
+Point Game::randomPoint() {
+    while (true) {
+        Point p{QRandomGenerator::global()->bounded(WIDTH + 1), QRandomGenerator::global()->bounded(HEIGHT + 1)};
+        auto safe = true;
+        for (const auto &point:state.snake) {
+            if (p == point) {
+                safe = false;
+                break;
+            }
+        }
+        if (safe) return p;
     }
 }

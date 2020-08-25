@@ -24,6 +24,7 @@ struct GameState {
     std::list<Point> snake;
     Direction direction;
     Direction nextDirection;
+    Point food;
     int growth;
     int speed;
 };

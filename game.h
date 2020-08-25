@@ -5,9 +5,11 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <iostream>
+#include <QtCore/QRandomGenerator>
 #include "constants.h"
 #include "ui_game.h"
 #include "types.h"
+#include "utils.h"
 
 using std::cout;
 using std::endl;
@@ -35,7 +37,8 @@ private:
             /* snake: */ std::list<Point>(),
             /* direction: */ undefined,
             /* nextDirection: */ undefined,
-            /* growth: */ -1,
+            /* food */ {12, 4},
+            /* growth: */ 0,
             /* speed: */ SPEED,
     };
 
@@ -44,6 +47,8 @@ private:
     void move();
 
     void changeStatus(Status status);
+
+    Point randomPoint();
 
 };
 

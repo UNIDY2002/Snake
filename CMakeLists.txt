@@ -20,6 +20,6 @@ find_package(Qt5Gui REQUIRED)
 
 aux_source_directory(. DIRS_SRCS)
 
-add_executable(Snake main.cpp game.cpp game.h constants.h types.h)
+add_executable(Snake main.cpp game.cpp game.h constants.h types.h utils.cpp utils.h)
 
 target_link_libraries(Snake Qt5::Widgets)
