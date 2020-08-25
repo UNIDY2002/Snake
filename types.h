@@ -9,6 +9,10 @@ enum Direction {
 
 struct Point {
     int x, y;
+
+    bool operator==(const Point &other) const {
+        return x == other.x && y == other.y;
+    }
 };
 
 enum Status {

@@ -5,8 +5,8 @@
 Game::Game(QWidget *parent) : QWidget(parent), ui(new Ui::Game), timer(new QTimer(this)) {
     ui->setupUi(this);
 
-    state.snake.push_back({14, 23});
     state.snake.push_back({15, 23});
+    state.snake.push_back({14, 23});
     state.direction = D;
 
     timer->callOnTimeout([&]() { move(); });
@@ -31,9 +31,25 @@ void Game::paintEvent(QPaintEvent *event) {
 
 void Game::move() {
     state.direction = state.nextDirection;
-    state.snake.erase(state.snake.begin());
-    auto beg = state.snake.begin();
-    state.snake.push_back({beg->x + dx[state.direction], beg->y + dy[state.direction]});
+    auto head = state.snake.begin();
+    Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
+    auto alive = true;
+    if (dest.x >= 0 && dest.x < COL && dest.y >= 0 && dest.y < ROW) {
+        for (const auto &point:state.snake) {
+            if (point == dest) {
+                alive = false;
+                break;
+            }
+        }
+    } else {
+        alive = false;
+    }
+    if (!alive) {
+        changeStatus(STOP);
+    } else {
+        state.snake.erase(--state.snake.end());
+        state.snake.push_front(dest);
+    }
     update();
 }
 
@@ -63,7 +79,8 @@ void Game::keyPressEvent(QKeyEvent *event) {
             break;
     }
 
-    if (targetDirection && (!state.direction || abs(state.direction - targetDirection) != 2)) {
+    if (targetDirection && state.status == START && (!state.direction || abs(state.direction - targetDirection) != 2)
+        || state.status == NONE) {
         state.nextDirection = targetDirection;
         changeStatus(START);
         return;
