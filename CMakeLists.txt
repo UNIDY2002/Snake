@@ -14,12 +14,10 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_PREFIX_PATH C:/Qt/5.15.0/mingw81_64)
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Gui REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Multimedia Widgets REQUIRED)
 
 aux_source_directory(. DIRS_SRCS)
 
 add_executable(Snake main.cpp game.cpp game.h constants.h types.h utils.cpp utils.h)
 
-target_link_libraries(Snake Qt5::Widgets)
+target_link_libraries(Snake Qt5::Core Qt5::Gui Qt5::Multimedia Qt5::Widgets)

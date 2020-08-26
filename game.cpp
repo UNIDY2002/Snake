@@ -27,6 +27,9 @@ void Game::paintEvent(QPaintEvent *event) {
     for (const auto &point:state.snake) {
         paintRect(painter, point, Qt::green);
     }
+    for (const auto &point:state.barriers) {
+        paintRect(painter, point, Qt::blue);
+    }
     paintRect(painter, state.food, Qt::red);
 }
 
@@ -34,20 +37,7 @@ void Game::move() {
     state.direction = state.nextDirection;
     auto head = state.snake.begin();
     Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
-    auto alive = true;
-    if (dest.x >= 0 && dest.x < COL && dest.y >= 0 && dest.y < ROW) {
-        for (const auto &point:state.snake) {
-            if (point == dest) {
-                alive = false;
-                break;
-            }
-        }
-    } else {
-        alive = false;
-    }
-    if (!alive) {
-        changeStatus(STOP);
-    } else {
+    if (dest.x >= 0 && dest.x < COL && dest.y >= 0 && dest.y < ROW && (dest == state.food || available(dest))) {
         if (state.growth) {
             --state.growth;
         } else {
@@ -58,6 +48,8 @@ void Game::move() {
             state.growth = 3;
             state.food = randomPoint();
         }
+    } else {
+        changeStatus(STOP);
     }
     update();
 }
@@ -118,13 +110,28 @@ void Game::changeStatus(Status status) {
 Point Game::randomPoint() {
     while (true) {
         Point p{QRandomGenerator::global()->bounded(WIDTH + 1), QRandomGenerator::global()->bounded(HEIGHT + 1)};
-        auto safe = true;
-        for (const auto &point:state.snake) {
-            if (p == point) {
-                safe = false;
-                break;
-            }
-        }
-        if (safe) return p;
+        if (available(p)) return p;
     }
+}
+
+void Game::mousePressEvent(QMouseEvent *event) {
+    auto x = event->x() / WIDTH;
+    auto y = event->y() / HEIGHT;
+    if (x > 0 && x < COL && y > 0 && y < ROW && state.status == NONE) {
+        if (state.barriers.find({x, y}) != state.barriers.end()) {
+            state.barriers.erase({x, y});
+        } else if (available({x, y})) {
+            state.barriers.insert({x, y});
+        }
+        update();
+    }
+}
+
+bool Game::available(const Point &p) {
+    for (const auto &point:state.snake)
+        if (point == p)
+            return false;
+    if (state.food == p)
+        return false;
+    return state.barriers.find(p) == state.barriers.end();
 }

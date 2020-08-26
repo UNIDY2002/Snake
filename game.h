@@ -4,13 +4,13 @@
 #include <QtWidgets/QWidget>
 #include <QKeyEvent>
 #include <QTimer>
-#include <iostream>
 #include <QtCore/QRandomGenerator>
 #include "constants.h"
 #include "ui_game.h"
 #include "types.h"
 #include "utils.h"
 
+#include <iostream>
 using std::cout;
 using std::endl;
 
@@ -28,6 +28,10 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
 
+    void keyPressEvent(QKeyEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
+
 private:
     Ui::Game *ui;
     QTimer *timer;
@@ -38,13 +42,14 @@ private:
             /* direction: */ undefined,
             /* nextDirection: */ undefined,
             /* food */ {12, 4},
+            /* barriers */ std::set<Point>(),
             /* growth: */ 0,
             /* speed: */ SPEED,
     };
 
-    void keyPressEvent(QKeyEvent *event) override;
-
     void move();
+
+    bool available(const Point &p);
 
     void changeStatus(Status status);
 
