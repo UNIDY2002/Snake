@@ -1,25 +1,18 @@
-#include <QtGui/QPainter>
 #include "game.h"
-#include "ui_game.h"
 
-Game::Game(QWidget *parent) : QWidget(parent), ui(new Ui::Game), timer(new QTimer(this)) {
-    ui->setupUi(this);
+Game::Game(QWidget *parent) : QWidget(parent), timer(new QTimer(this)) {
     timer->callOnTimeout([&]() { move(); });
+    setFocus();
     init();
 }
 
 Game::~Game() {
-    delete ui;
     delete timer;
 }
 
 void Game::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
-    for (int x = 0; x < ROW; ++x) {
-        for (int y = 0; y < COL; ++y) {
-            painter.drawRect(QRect(x * WIDTH, y * HEIGHT, WIDTH, HEIGHT));
-        }
-    }
+    painter.drawRect(QRect(boardOccupation.x, boardOccupation.y, boardOccupation.boardSize, boardOccupation.boardSize));
     for (const auto &point:state.snake) {
         paintRect(painter, point, point == state.snake.front() ? Qt::darkGreen : Qt::green);
     }
@@ -29,40 +22,13 @@ void Game::paintEvent(QPaintEvent *event) {
     paintRect(painter, state.food, Qt::red);
 }
 
-void Game::init() {
-    auto point = randomPoint(COL / 3, COL * 2 / 3, ROW / 3, ROW * 2 / 3);
-    state.direction = static_cast<Direction>(QRandomGenerator::global()->bounded(W, D + 1));
-    state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
-    state.snake.push_back(point);
-    state.food = randomPoint();
-}
-
-void Game::move() {
-    state.direction = state.nextDirection;
-    auto head = state.snake.begin();
-    Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
-    if (dest.x >= 0 && dest.x < COL && dest.y >= 0 && dest.y < ROW && (dest == state.food || available(dest))) {
-        if (state.growth) {
-            --state.growth;
-        } else {
-            state.snake.erase(--state.snake.end());
-        }
-        state.snake.push_front(dest);
-        if (dest == state.food) {
-            state.growth = 3;
-            state.food = randomPoint();
-        }
-    } else {
-        changeStatus(STOP);
-    }
-    update();
-}
-
-void Game::restart() {
-    if (timer->isActive()) timer->stop();
-    state = defaultState;
-    init();
-    update();
+void Game::resizeEvent(QResizeEvent *event) {
+    auto w = event->size().width();
+    auto h = event->size().height();
+    boardOccupation.gridSize = (std::min(w, h) / N);
+    boardOccupation.boardSize = boardOccupation.gridSize * N;
+    boardOccupation.x = (w - boardOccupation.boardSize) / 2;
+    boardOccupation.y = (h - boardOccupation.boardSize) / 2;
 }
 
 void Game::keyPressEvent(QKeyEvent *event) {
@@ -103,6 +69,64 @@ void Game::keyPressEvent(QKeyEvent *event) {
     }
 }
 
+void Game::mousePressEvent(QMouseEvent *event) {
+    auto x = (event->x() - boardOccupation.x) / boardOccupation.gridSize;
+    auto y = (event->y() - boardOccupation.y) / boardOccupation.gridSize;
+    if (x > 0 && x < N && y > 0 && y < N && state.status == NONE) {
+        if (state.barriers.find({x, y}) != state.barriers.end()) {
+            state.barriers.erase({x, y});
+        } else if (available({x, y})) {
+            state.barriers.insert({x, y});
+        }
+        update();
+    }
+}
+
+void Game::init() {
+    auto point = randomPoint(N / 3, N * 2 / 3, N / 3, N * 2 / 3);
+    state.direction = static_cast<Direction>(QRandomGenerator::global()->bounded(W, D + 1));
+    state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
+    state.snake.push_back(point);
+    state.food = randomPoint();
+}
+
+void Game::move() {
+    state.direction = state.nextDirection;
+    auto head = state.snake.begin();
+    Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
+    if (dest.x >= 0 && dest.x < N && dest.y >= 0 && dest.y < N && (dest == state.food || available(dest))) {
+        if (state.growth) {
+            --state.growth;
+        } else {
+            state.snake.erase(--state.snake.end());
+        }
+        state.snake.push_front(dest);
+        if (dest == state.food) {
+            state.growth = 3;
+            state.food = randomPoint();
+        }
+    } else {
+        changeStatus(STOP);
+    }
+    update();
+}
+
+void Game::restart() {
+    if (timer->isActive()) timer->stop();
+    state = defaultState;
+    init();
+    update();
+}
+
+bool Game::available(const Point &p) {
+    for (const auto &point:state.snake)
+        if (point == p)
+            return false;
+    if (state.food == p)
+        return false;
+    return state.barriers.find(p) == state.barriers.end();
+}
+
 void Game::changeStatus(Status status) {
     if (status != state.status) {
         switch (status) {
@@ -130,26 +154,11 @@ Point Game::randomPoint(int left, int right, int top, int bottom) {
     }
 }
 
-void Game::mousePressEvent(QMouseEvent *event) {
-    auto x = event->x() / WIDTH;
-    auto y = event->y() / HEIGHT;
-    if (x > 0 && x < COL && y > 0 && y < ROW && state.status == NONE) {
-        if (state.barriers.find({x, y}) != state.barriers.end()) {
-            state.barriers.erase({x, y});
-        } else if (available({x, y})) {
-            state.barriers.insert({x, y});
-        }
-        update();
-    }
-}
-
-bool Game::available(const Point &p) {
-    for (const auto &point:state.snake)
-        if (point == p)
-            return false;
-    if (state.food == p)
-        return false;
-    return state.barriers.find(p) == state.barriers.end();
+void Game::paintRect(QPainter &painter, const Point &p, const Qt::GlobalColor &color) const {
+    painter.fillRect(QRect(boardOccupation.x + p.x * boardOccupation.gridSize,
+                           boardOccupation.y + p.y * boardOccupation.gridSize,
+                           boardOccupation.gridSize,
+                           boardOccupation.gridSize), color);
 }
 
 GameState Game::defaultState = {

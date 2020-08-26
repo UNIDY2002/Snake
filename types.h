@@ -17,7 +17,7 @@ struct Point {
     }
 
     bool operator<(const Point &other) const {
-        return x * ROW + y < other.x * ROW + other.y;
+        return x * N + y < other.x * N + other.y;
     }
 };
 
@@ -34,6 +34,10 @@ struct GameState {
     std::set<Point> barriers;
     int growth;
     int speed;
+};
+
+struct BoardOccupation {
+    int x, y, boardSize, gridSize;
 };
 
 #endif //SNAKE_TYPES_H
