@@ -11,6 +11,7 @@
 #include "utils.h"
 
 #include <iostream>
+
 using std::cout;
 using std::endl;
 
@@ -36,24 +37,21 @@ private:
     Ui::Game *ui;
     QTimer *timer;
 
-    GameState state = {
-            /* status: */ NONE,
-            /* snake: */ std::list<Point>(),
-            /* direction: */ undefined,
-            /* nextDirection: */ undefined,
-            /* food */ {12, 4},
-            /* barriers */ std::set<Point>(),
-            /* growth: */ 0,
-            /* speed: */ SPEED,
-    };
+    static GameState defaultState;
+
+    GameState state = defaultState;
+
+    void init();
 
     void move();
+
+    void restart();
 
     bool available(const Point &p);
 
     void changeStatus(Status status);
 
-    Point randomPoint();
+    Point randomPoint(int left = 0, int right = COL, int top = 0, int bottom = ROW);
 
 };
 

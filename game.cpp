@@ -4,12 +4,8 @@
 
 Game::Game(QWidget *parent) : QWidget(parent), ui(new Ui::Game), timer(new QTimer(this)) {
     ui->setupUi(this);
-
-    state.snake.push_back({15, 23});
-    state.snake.push_back({14, 23});
-    state.direction = D;
-
     timer->callOnTimeout([&]() { move(); });
+    init();
 }
 
 Game::~Game() {
@@ -25,12 +21,19 @@ void Game::paintEvent(QPaintEvent *event) {
         }
     }
     for (const auto &point:state.snake) {
-        paintRect(painter, point, Qt::green);
+        paintRect(painter, point, point == state.snake.front() ? Qt::darkGreen : Qt::green);
     }
     for (const auto &point:state.barriers) {
         paintRect(painter, point, Qt::blue);
     }
     paintRect(painter, state.food, Qt::red);
+}
+
+void Game::init() {
+    auto point = randomPoint(COL / 3, COL * 2 / 3, ROW / 3, ROW * 2 / 3);
+    state.direction = static_cast<Direction>(QRandomGenerator::global()->bounded(W, D + 1));
+    state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
+    state.snake.push_back(point);
 }
 
 void Game::move() {
@@ -51,6 +54,13 @@ void Game::move() {
     } else {
         changeStatus(STOP);
     }
+    update();
+}
+
+void Game::restart() {
+    if (timer->isActive()) timer->stop();
+    state = defaultState;
+    init();
     update();
 }
 
@@ -76,6 +86,10 @@ void Game::keyPressEvent(QKeyEvent *event) {
                 changeStatus(PAUSE);
             else if (state.status == PAUSE)
                 changeStatus(START);
+            break;
+        case Qt::Key_R:
+            restart();
+            return;
         default:
             break;
     }
@@ -92,6 +106,7 @@ void Game::changeStatus(Status status) {
     if (status != state.status) {
         switch (status) {
             case NONE:
+                if (timer->isActive()) timer->stop();
                 break;
             case START:
                 if (!timer->isActive()) timer->start(state.speed);
@@ -107,9 +122,9 @@ void Game::changeStatus(Status status) {
     }
 }
 
-Point Game::randomPoint() {
+Point Game::randomPoint(int left, int right, int top, int bottom) {
     while (true) {
-        Point p{QRandomGenerator::global()->bounded(WIDTH + 1), QRandomGenerator::global()->bounded(HEIGHT + 1)};
+        Point p{QRandomGenerator::global()->bounded(left, right), QRandomGenerator::global()->bounded(top, bottom)};
         if (available(p)) return p;
     }
 }
@@ -135,3 +150,14 @@ bool Game::available(const Point &p) {
         return false;
     return state.barriers.find(p) == state.barriers.end();
 }
+
+GameState Game::defaultState = {
+        /* status: */ NONE,
+        /* snake: */ std::list<Point>(),
+        /* direction: */ undefined,
+        /* nextDirection: */ undefined,
+        /* food */ {12, 4},
+        /* barriers */ std::set<Point>(),
+        /* growth: */ 0,
+        /* speed: */ SPEED,
+};
