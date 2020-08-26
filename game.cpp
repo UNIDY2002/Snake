@@ -34,6 +34,7 @@ void Game::init() {
     state.direction = static_cast<Direction>(QRandomGenerator::global()->bounded(W, D + 1));
     state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
     state.snake.push_back(point);
+    state.food = randomPoint();
 }
 
 void Game::move() {
@@ -94,8 +95,8 @@ void Game::keyPressEvent(QKeyEvent *event) {
             break;
     }
 
-    if (targetDirection && state.status == START && (!state.direction || abs(state.direction - targetDirection) != 2)
-        || state.status == NONE) {
+    if (targetDirection && (state.status == START && (!state.direction || abs(state.direction - targetDirection) != 2)
+                            || state.status == NONE)) {
         state.nextDirection = targetDirection;
         changeStatus(START);
         return;
@@ -156,7 +157,7 @@ GameState Game::defaultState = {
         /* snake: */ std::list<Point>(),
         /* direction: */ undefined,
         /* nextDirection: */ undefined,
-        /* food */ {12, 4},
+        /* food */ {-1, -1},
         /* barriers */ std::set<Point>(),
         /* growth: */ 0,
         /* speed: */ SPEED,
