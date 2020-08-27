@@ -63,7 +63,10 @@ void Game::keyPressEvent(QKeyEvent *event) {
             restart();
             return;
         case Qt::Key_S:
-            save();
+            if (state.status == PAUSE) save();
+            return;
+        case Qt::Key_L:
+            if (state.status == NONE) load();
             return;
         default:
             break;
@@ -184,6 +187,39 @@ void Game::save() {
         file.close();
     } else {
         QMessageBox::critical(this, "critical", "File save failure.", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void Game::load() {
+    QFile file(QFileDialog::getOpenFileName(this, "Open", "game.json"));
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        try {
+            GameState newState = defaultState;
+            QJsonDocument document = QJsonDocument::fromJson(file.readAll());
+            QJsonObject object = document.object();
+            QJsonArray snakeX = object.value("snakeX").toArray();
+            QJsonArray snakeY = object.value("snakeY").toArray();
+            assert(snakeX.size() == snakeY.size() && snakeX.size() >= 2);
+            for (int i = 0; i < snakeX.size(); ++i) {
+                newState.snake.push_back({snakeX[i].toInt(), snakeY[i].toInt()});
+            }
+            newState.direction = newState.nextDirection = static_cast<Direction>(object.value("direction").toInt());
+            newState.food = {object.value("foodX").toInt(), object.value("foodY").toInt()};
+            QJsonArray barriersX = object.value("barriersX").toArray();
+            QJsonArray barriersY = object.value("barriersY").toArray();
+            assert(barriersX.size() == barriersY.size());
+            for (int i = 0; i < barriersX.size(); ++i) {
+                newState.barriers.insert({barriersX[i].toInt(), barriersY[i].toInt()});
+            }
+            newState.growth = object.value("growth").toInt();
+            newState.speed = object.value("speed").toInt();
+            state = newState;
+            update();
+        } catch (std::exception &e) {
+            QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
+        }
+    } else {
+        QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
     }
 }
 

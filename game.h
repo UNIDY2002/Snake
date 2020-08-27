@@ -51,6 +51,8 @@ private:
 
     void save();
 
+    void load();
+
     Point randomPoint(int left = 0, int right = N, int top = 0, int bottom = N);
 
     void paintRect(QPainter &painter, const Point &p, const Qt::GlobalColor &color) const;
