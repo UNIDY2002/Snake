@@ -28,6 +28,14 @@ public:
 
     void save();
 
+    void start();
+
+    void pause();
+
+    void resume();
+
+    void restart();
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 
@@ -51,8 +59,6 @@ private:
     void init();
 
     void move();
-
-    void restart();
 
     bool available(const Point &p);
 

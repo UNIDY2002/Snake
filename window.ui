@@ -26,7 +26,7 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="open"/>
+    <addaction name="load"/>
     <addaction name="save"/>
    </widget>
    <widget class="QMenu" name="menuGame">
@@ -34,6 +34,9 @@
      <string>Game</string>
     </property>
     <addaction name="start"/>
+    <addaction name="pause"/>
+    <addaction name="resume"/>
+    <addaction name="restart"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuGame"/>
@@ -49,20 +52,19 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="open"/>
+   <addaction name="load"/>
    <addaction name="save"/>
+   <addaction name="start"/>
+   <addaction name="pause"/>
+   <addaction name="resume"/>
+   <addaction name="restart"/>
   </widget>
-  <action name="open">
+  <action name="load">
    <property name="text">
     <string>Load</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="start">
-   <property name="text">
-    <string>Start</string>
    </property>
   </action>
   <action name="save">
@@ -71,6 +73,38 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="start">
+   <property name="text">
+    <string>Start</string>
+   </property>
+   <property name="shortcut">
+    <string>S</string>
+   </property>
+  </action>
+  <action name="pause">
+   <property name="text">
+    <string>Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+  </action>
+  <action name="resume">
+   <property name="text">
+    <string>Resume</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
+   </property>
+  </action>
+  <action name="restart">
+   <property name="text">
+    <string>Restart</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
    </property>
   </action>
  </widget>

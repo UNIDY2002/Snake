@@ -83,6 +83,28 @@ void Game::save() {
     }
 }
 
+void Game::start() {
+    changeStatus(START);
+    state.food = randomPoint();
+}
+
+void Game::pause() {
+    changeStatus(PAUSE);
+    if (timer->isActive()) timer->stop();
+}
+
+void Game::resume() {
+    changeStatus(START);
+    if (!timer->isActive()) timer->start(state.speed);
+}
+
+void Game::restart() {
+    if (timer->isActive()) timer->stop();
+    state = defaultState;
+    init();
+    update();
+}
+
 void Game::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.drawRect(QRect(boardOccupation.x, boardOccupation.y, boardOccupation.boardSize, boardOccupation.boardSize));
@@ -92,7 +114,9 @@ void Game::paintEvent(QPaintEvent *event) {
     for (const auto &point:state.barriers) {
         paintRect(painter, point, Qt::blue);
     }
-    paintRect(painter, state.food, Qt::red);
+    if (state.food.x > -1) {
+        paintRect(painter, state.food, Qt::red);
+    }
     painter.setFont(QFont("Consolas", 28, QFont::Bold));
     painter.setPen(state.status == STOP ? Qt::red : QColor(128, 128, 128, 70));
     painter.drawText(boardOccupation.x + 10,
@@ -110,9 +134,8 @@ void Game::resizeEvent(QResizeEvent *event) {
 }
 
 void Game::keyPressEvent(QKeyEvent *event) {
-    auto key = event->key();
-    auto targetDirection = undefined;
-    switch (key) {
+    Direction targetDirection;
+    switch (event->key()) {
         case Qt::Key_Up:
             targetDirection = W;
             break;
@@ -125,25 +148,13 @@ void Game::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Right:
             targetDirection = D;
             break;
-        case Qt::Key_P:
-        case Qt::Key_Space:
-            if (state.status == START)
-                changeStatus(PAUSE);
-            else if (state.status == PAUSE)
-                changeStatus(START);
-            break;
-        case Qt::Key_R:
-            restart();
-            return;
         default:
-            break;
+            return;
     }
 
-    if (targetDirection && (state.status == START && (!state.direction || abs(state.direction - targetDirection) != 2)
-                            || state.status == NONE)) {
+    if (state.status == START && abs(state.direction - targetDirection) != 2) {
         state.nextDirection = targetDirection;
-        changeStatus(START);
-        return;
+        if (!timer->isActive()) timer->start(state.speed);
     }
 }
 
@@ -165,37 +176,31 @@ void Game::init() {
     state.direction = static_cast<Direction>(QRandomGenerator::global()->bounded(W, D + 1));
     state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
     state.snake.push_back(point);
-    state.food = randomPoint();
     parent->refreshActions(NONE, NONE);
 }
 
 void Game::move() {
-    state.direction = state.nextDirection;
-    auto head = state.snake.begin();
-    Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
-    if (dest.x >= 0 && dest.x < N && dest.y >= 0 && dest.y < N && (dest == state.food || available(dest))) {
-        if (state.growth) {
-            --state.growth;
+    if((state.direction = state.nextDirection)) {
+        auto head = state.snake.begin();
+        Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
+        if (dest.x >= 0 && dest.x < N && dest.y >= 0 && dest.y < N && (dest == state.food || available(dest))) {
+            if (state.growth) {
+                --state.growth;
+            } else {
+                state.snake.erase(--state.snake.end());
+            }
+            state.snake.push_front(dest);
+            if (dest == state.food) {
+                state.growth = 3;
+                state.food = randomPoint();
+            }
+            ++state.ticks;
         } else {
-            state.snake.erase(--state.snake.end());
+            changeStatus(STOP);
+            timer->stop();
         }
-        state.snake.push_front(dest);
-        if (dest == state.food) {
-            state.growth = 3;
-            state.food = randomPoint();
-        }
-        ++state.ticks;
-    } else {
-        changeStatus(STOP);
+        update();
     }
-    update();
-}
-
-void Game::restart() {
-    if (timer->isActive()) timer->stop();
-    state = defaultState;
-    init();
-    update();
 }
 
 bool Game::available(const Point &p) {
@@ -209,20 +214,6 @@ bool Game::available(const Point &p) {
 
 void Game::changeStatus(Status status) {
     if (status != state.status) {
-        switch (status) {
-            case NONE:
-                if (timer->isActive()) timer->stop();
-                break;
-            case START:
-                if (!timer->isActive()) timer->start(state.speed);
-                break;
-            case PAUSE:
-                timer->stop();
-                break;
-            case STOP:
-                timer->stop();
-                break;
-        }
         parent->refreshActions(state.status, status);
         state.status = status;
     }
