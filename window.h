@@ -5,11 +5,6 @@
 #include "ui_window.h"
 #include "game.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
 namespace Ui {
     class Window;
 }
@@ -22,6 +17,9 @@ public:
     ~Window() override;
 
     void refreshActions(Status original, Status status);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::Window *ui;

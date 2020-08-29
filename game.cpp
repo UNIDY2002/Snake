@@ -3,6 +3,10 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
+#include <QtCore/QRandomGenerator>
+#include <QtGui/QPainter>
+#include <QKeyEvent>
+#include <QTimer>
 #include "game.h"
 
 Game::Game(Window *parent) : QWidget(parent), parent(parent), timer(new QTimer(this)), ui(new Ui::Game) {
@@ -18,16 +22,17 @@ Game::~Game() {
 }
 
 void Game::load() {
-    QFile file(QFileDialog::getOpenFileName(this, "Open", "game.json"));
+    QFile file(QFileDialog::getOpenFileName(this, "Open", "game.json", "JSON file (*.json)"));
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         try {
             GameState newState = defaultState;
-            QJsonDocument document = QJsonDocument::fromJson(file.readAll());
-            QJsonObject object = document.object();
+            QJsonObject object = QJsonDocument::fromJson(file.readAll()).object();
             QJsonArray snakeX = object.value("snakeX").toArray();
             QJsonArray snakeY = object.value("snakeY").toArray();
-            if (snakeX.size() != snakeY.size() && snakeX.size() < 2) {
+            if (snakeX.size() != snakeY.size()) {
                 throw std::runtime_error("Length of snakeX and snakeY does not match.");
+            } else if (snakeX.size() < 2) {
+                throw std::runtime_error("Length of snake should be at least 2.");
             }
             for (int i = 0; i < snakeX.size(); ++i) {
                 newState.snake.push_back({snakeX[i].toInt(), snakeY[i].toInt()});
@@ -54,7 +59,7 @@ void Game::load() {
 }
 
 void Game::save() {
-    QFile file(QFileDialog::getSaveFileName(this, "Save", "game.json"));
+    QFile file(QFileDialog::getSaveFileName(this, "Save", "game.json", "JSON file (*.json)"));
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QJsonObject json;
         QJsonArray snakeX, snakeY;
@@ -77,9 +82,7 @@ void Game::save() {
         json.insert("growth", state.growth);
         json.insert("speed", state.speed);
         json.insert("ticks", state.ticks);
-        QJsonDocument document;
-        document.setObject(json);
-        file.write(document.toJson(QJsonDocument::Compact));
+        file.write(QJsonDocument(json).toJson(QJsonDocument::Compact));
         file.close();
     }
 }

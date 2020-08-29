@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Snake</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/resources/windowIcon.svg</normaloff>:/resources/windowIcon.svg</iconset>
+  </property>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>

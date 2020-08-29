@@ -1,3 +1,5 @@
+#include <QtWidgets/QMessageBox>
+#include <QCloseEvent>
 #include "window.h"
 
 Window::Window(QWidget *parent) : QMainWindow(parent), ui(new Ui::Window) {
@@ -36,5 +38,13 @@ void Window::refreshActions(Status original, Status status) {
             break;
         default:
             ui->statusbar->clearMessage();
+    }
+}
+
+void Window::closeEvent(QCloseEvent *event) {
+    if (QMessageBox::information(this, "Confirm", "Are you sure to exit?", "Yes", "No")) {
+        event->ignore();
+    } else {
+        event->accept();
     }
 }

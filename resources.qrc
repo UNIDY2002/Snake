@@ -1,5 +1,6 @@
 <RCC>
   <qresource>
+    <file>resources/windowIcon.svg</file>
     <file>resources/open.svg</file>
     <file>resources/save.svg</file>
     <file>resources/exit.svg</file>

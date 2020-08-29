@@ -2,19 +2,10 @@
 #define SNAKE_GAME_H
 
 #include <QtWidgets/QWidget>
-#include <QtGui/QPainter>
-#include <QKeyEvent>
-#include <QTimer>
-#include <QtCore/QRandomGenerator>
 #include "constants.h"
 #include "types.h"
 #include "window.h"
 #include "ui_game.h"
-
-#include <iostream>
-
-using std::cout;
-using std::endl;
 
 class Window;
 
