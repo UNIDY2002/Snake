@@ -1,0 +1,11 @@
+<RCC>
+  <qresource>
+    <file>resources/open.svg</file>
+    <file>resources/save.svg</file>
+    <file>resources/exit.svg</file>
+    <file>resources/start.svg</file>
+    <file>resources/pause.svg</file>
+    <file>resources/resume.svg</file>
+    <file>resources/restart.svg</file>
+  </qresource>
+</RCC>

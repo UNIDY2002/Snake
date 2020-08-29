@@ -18,6 +18,8 @@ find_package(Qt5 COMPONENTS Core Gui Multimedia Widgets REQUIRED)
 
 aux_source_directory(. DIRS_SRCS)
 
-add_executable(Snake main.cpp game.cpp game.h constants.h types.h window.cpp window.h)
+qt5_add_resources(QRC_FILES resources.qrc)
+
+add_executable(Snake main.cpp game.cpp game.h constants.h types.h window.cpp window.h ${QRC_FILES})
 
 target_link_libraries(Snake Qt5::Core Qt5::Gui Qt5::Multimedia Qt5::Widgets)

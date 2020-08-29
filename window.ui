@@ -28,6 +28,8 @@
     </property>
     <addaction name="load"/>
     <addaction name="save"/>
+    <addaction name="separator"/>
+    <addaction name="exit"/>
    </widget>
    <widget class="QMenu" name="menuGame">
     <property name="title">
@@ -54,12 +56,18 @@
    </attribute>
    <addaction name="load"/>
    <addaction name="save"/>
+   <addaction name="exit"/>
+   <addaction name="separator"/>
    <addaction name="start"/>
    <addaction name="pause"/>
    <addaction name="resume"/>
    <addaction name="restart"/>
   </widget>
   <action name="load">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/open.svg</normaloff>:/resources/open.svg</iconset>
+   </property>
    <property name="text">
     <string>Load</string>
    </property>
@@ -68,6 +76,10 @@
    </property>
   </action>
   <action name="save">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/save.svg</normaloff>:/resources/save.svg</iconset>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -75,7 +87,20 @@
     <string>Ctrl+S</string>
    </property>
   </action>
+  <action name="exit">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/exit.svg</normaloff>:/resources/exit.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
   <action name="start">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/start.svg</normaloff>:/resources/start.svg</iconset>
+   </property>
    <property name="text">
     <string>Start</string>
    </property>
@@ -84,6 +109,10 @@
    </property>
   </action>
   <action name="pause">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/pause.svg</normaloff>:/resources/pause.svg</iconset>
+   </property>
    <property name="text">
     <string>Pause</string>
    </property>
@@ -92,6 +121,10 @@
    </property>
   </action>
   <action name="resume">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/resume.svg</normaloff>:/resources/resume.svg</iconset>
+   </property>
    <property name="text">
     <string>Resume</string>
    </property>
@@ -100,6 +133,10 @@
    </property>
   </action>
   <action name="restart">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resources/restart.svg</normaloff>:/resources/restart.svg</iconset>
+   </property>
    <property name="text">
     <string>Restart</string>
    </property>
@@ -108,6 +145,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

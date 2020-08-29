@@ -86,6 +86,7 @@ void Game::save() {
 void Game::start() {
     changeStatus(START);
     state.food = randomPoint();
+    update();
 }
 
 void Game::pause() {
@@ -180,7 +181,7 @@ void Game::init() {
 }
 
 void Game::move() {
-    if((state.direction = state.nextDirection)) {
+    if ((state.direction = state.nextDirection)) {
         auto head = state.snake.begin();
         Point dest{head->x + dx[state.direction], head->y + dy[state.direction]};
         if (dest.x >= 0 && dest.x < N && dest.y >= 0 && dest.y < N && (dest == state.food || available(dest))) {
