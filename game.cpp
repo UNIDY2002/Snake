@@ -5,14 +5,16 @@
 #include <QtCore/QJsonArray>
 #include "game.h"
 
-Game::Game(Window *parent) : QWidget(parent), parent(parent), timer(new QTimer(this)) {
+Game::Game(Window *parent) : QWidget(parent), parent(parent), timer(new QTimer(this)), ui(new Ui::Game) {
     timer->callOnTimeout([&]() { move(); });
+    ui->setupUi(this);
     setFocus();
     init();
 }
 
 Game::~Game() {
     delete timer;
+    delete ui;
 }
 
 void Game::load() {
@@ -126,7 +128,7 @@ void Game::paintEvent(QPaintEvent *event) {
 }
 
 void Game::resizeEvent(QResizeEvent *event) {
-    auto w = event->size().width();
+    auto w = event->size().width() - ui->buttons->geometry().width() - 15;
     auto h = event->size().height();
     boardOccupation.gridSize = (std::min(w, h) / N);
     boardOccupation.boardSize = boardOccupation.gridSize * N;

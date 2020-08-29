@@ -9,6 +9,7 @@
 #include "constants.h"
 #include "types.h"
 #include "window.h"
+#include "ui_game.h"
 
 #include <iostream>
 
@@ -16,6 +17,10 @@ using std::cout;
 using std::endl;
 
 class Window;
+
+namespace Ui {
+    class Game;
+}
 
 class Game : public QWidget {
 Q_OBJECT
@@ -49,6 +54,8 @@ private:
     Window *parent;
 
     QTimer *timer;
+
+    Ui::Game *ui;
 
     static GameState defaultState;
 
