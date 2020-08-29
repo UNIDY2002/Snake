@@ -21,7 +21,7 @@ public:
 
     ~Window() override;
 
-    void refreshButtons(Status status);
+    void refreshActions(Status original, Status status);
 
 private:
     Ui::Window *ui;

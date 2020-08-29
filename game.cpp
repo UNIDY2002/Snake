@@ -41,6 +41,7 @@ void Game::load() {
             newState.ticks = object.value("ticks").toInt();
             state = newState;
             update();
+            changeStatus(PAUSE);
         } catch (std::exception &e) {
             QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
         }
@@ -165,7 +166,7 @@ void Game::init() {
     state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
     state.snake.push_back(point);
     state.food = randomPoint();
-    parent->refreshButtons(NONE);
+    parent->refreshActions(NONE, NONE);
 }
 
 void Game::move() {
@@ -222,9 +223,9 @@ void Game::changeStatus(Status status) {
                 timer->stop();
                 break;
         }
+        parent->refreshActions(state.status, status);
         state.status = status;
     }
-    parent->refreshButtons(state.status);
 }
 
 Point Game::randomPoint(int left, int right, int top, int bottom) {

@@ -12,7 +12,20 @@ Window::~Window() {
     delete ui;
 }
 
-void Window::refreshButtons(Status status) {
+void Window::refreshActions(Status original, Status status) {
     ui->open->setEnabled(status == NONE);
     ui->save->setEnabled(status == PAUSE);
+    switch (status) {
+        case START:
+            ui->statusbar->showMessage(original == NONE ? "Game starts." : "Game resumes.", 2400);
+            break;
+        case PAUSE:
+            ui->statusbar->showMessage("Pausing.");
+            break;
+        case STOP:
+            ui->statusbar->showMessage("Game stopped.", 2400);
+            break;
+        default:
+            ui->statusbar->clearMessage();
+    }
 }
