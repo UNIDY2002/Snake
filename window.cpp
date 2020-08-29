@@ -6,7 +6,6 @@ Window::Window(QWidget *parent) : QMainWindow(parent), ui(new Ui::Window) {
     setCentralWidget(game);
     connect(ui->open, &QAction::triggered, game, &Game::load);
     connect(ui->save, &QAction::triggered, game, &Game::save);
-    refreshButtons(NONE);
 }
 
 Window::~Window() {

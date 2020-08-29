@@ -34,6 +34,7 @@ struct GameState {
     std::set<Point> barriers;
     int growth;
     int speed;
+    int ticks;
 };
 
 struct BoardOccupation {

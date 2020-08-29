@@ -38,6 +38,7 @@ void Game::load() {
             }
             newState.growth = object.value("growth").toInt();
             newState.speed = object.value("speed").toInt();
+            newState.ticks = object.value("ticks").toInt();
             state = newState;
             update();
         } catch (std::exception &e) {
@@ -71,6 +72,7 @@ void Game::save() {
         json.insert("barriersY", barriersY);
         json.insert("growth", state.growth);
         json.insert("speed", state.speed);
+        json.insert("ticks", state.ticks);
         QJsonDocument document;
         document.setObject(json);
         file.write(document.toJson(QJsonDocument::Compact));
@@ -90,6 +92,11 @@ void Game::paintEvent(QPaintEvent *event) {
         paintRect(painter, point, Qt::blue);
     }
     paintRect(painter, state.food, Qt::red);
+    painter.setFont(QFont("Consolas", 28, QFont::Bold));
+    painter.setPen(state.status == STOP ? Qt::red : QColor(128, 128, 128, 70));
+    painter.drawText(boardOccupation.x + 10,
+                     boardOccupation.y + boardOccupation.boardSize - 10,
+                     QString::number(state.ticks));
 }
 
 void Game::resizeEvent(QResizeEvent *event) {
@@ -158,6 +165,7 @@ void Game::init() {
     state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
     state.snake.push_back(point);
     state.food = randomPoint();
+    parent->refreshButtons(NONE);
 }
 
 void Game::move() {
@@ -175,6 +183,7 @@ void Game::move() {
             state.growth = 3;
             state.food = randomPoint();
         }
+        ++state.ticks;
     } else {
         changeStatus(STOP);
     }
@@ -241,4 +250,5 @@ GameState Game::defaultState = {
         /* barriers */ std::set<Point>(),
         /* growth: */ 0,
         /* speed: */ SPEED,
+        /* ticks: */ 0,
 };
