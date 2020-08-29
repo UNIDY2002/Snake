@@ -26,7 +26,9 @@ void Game::load() {
             QJsonObject object = document.object();
             QJsonArray snakeX = object.value("snakeX").toArray();
             QJsonArray snakeY = object.value("snakeY").toArray();
-            assert(snakeX.size() == snakeY.size() && snakeX.size() >= 2);
+            if (snakeX.size() != snakeY.size() && snakeX.size() < 2) {
+                throw std::runtime_error("Length of snakeX and snakeY does not match.");
+            }
             for (int i = 0; i < snakeX.size(); ++i) {
                 newState.snake.push_back({snakeX[i].toInt(), snakeY[i].toInt()});
             }
@@ -34,7 +36,9 @@ void Game::load() {
             newState.food = {object.value("foodX").toInt(), object.value("foodY").toInt()};
             QJsonArray barriersX = object.value("barriersX").toArray();
             QJsonArray barriersY = object.value("barriersY").toArray();
-            assert(barriersX.size() == barriersY.size());
+            if (barriersX.size() != barriersY.size()) {
+                throw std::runtime_error("Length of barriersX and barriersY does not match.");
+            }
             for (int i = 0; i < barriersX.size(); ++i) {
                 newState.barriers.insert({barriersX[i].toInt(), barriersY[i].toInt()});
             }
@@ -44,10 +48,8 @@ void Game::load() {
             state = newState;
             changeStatus(PAUSE);
         } catch (std::exception &e) {
-            QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
+            QMessageBox::critical(this, "File open failure.", e.what());
         }
-    } else {
-        QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
     }
 }
 
@@ -79,8 +81,6 @@ void Game::save() {
         document.setObject(json);
         file.write(document.toJson(QJsonDocument::Compact));
         file.close();
-    } else {
-        QMessageBox::critical(this, "critical", "File save failure.", QMessageBox::Yes, QMessageBox::Yes);
     }
 }
 
