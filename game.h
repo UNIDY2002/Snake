@@ -8,18 +8,25 @@
 #include <QtCore/QRandomGenerator>
 #include "constants.h"
 #include "types.h"
+#include "window.h"
 
 #include <iostream>
 
 using std::cout;
 using std::endl;
 
+class Window;
+
 class Game : public QWidget {
 Q_OBJECT
 public:
-    explicit Game(QWidget *parent = nullptr);
+    explicit Game(Window *parent = nullptr);
 
     ~Game() override;
+
+    void load();
+
+    void save();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -31,6 +38,8 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
 
 private:
+    Window *parent;
+
     QTimer *timer;
 
     static GameState defaultState;
@@ -48,10 +57,6 @@ private:
     bool available(const Point &p);
 
     void changeStatus(Status status);
-
-    void save();
-
-    void load();
 
     Point randomPoint(int left = 0, int right = N, int top = 0, int bottom = N);
 

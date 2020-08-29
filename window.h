@@ -5,6 +5,11 @@
 #include "ui_window.h"
 #include "game.h"
 
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 namespace Ui {
     class Window;
 }
@@ -15,6 +20,8 @@ public:
     explicit Window(QWidget *parent = nullptr);
 
     ~Window() override;
+
+    void refreshButtons(Status status);
 
 private:
     Ui::Window *ui;

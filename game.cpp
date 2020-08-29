@@ -5,7 +5,7 @@
 #include <QtCore/QJsonArray>
 #include "game.h"
 
-Game::Game(QWidget *parent) : QWidget(parent), timer(new QTimer(this)) {
+Game::Game(Window *parent) : QWidget(parent), parent(parent), timer(new QTimer(this)) {
     timer->callOnTimeout([&]() { move(); });
     setFocus();
     init();
@@ -13,6 +13,71 @@ Game::Game(QWidget *parent) : QWidget(parent), timer(new QTimer(this)) {
 
 Game::~Game() {
     delete timer;
+}
+
+void Game::load() {
+    QFile file(QFileDialog::getOpenFileName(this, "Open", "game.json"));
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        try {
+            GameState newState = defaultState;
+            QJsonDocument document = QJsonDocument::fromJson(file.readAll());
+            QJsonObject object = document.object();
+            QJsonArray snakeX = object.value("snakeX").toArray();
+            QJsonArray snakeY = object.value("snakeY").toArray();
+            assert(snakeX.size() == snakeY.size() && snakeX.size() >= 2);
+            for (int i = 0; i < snakeX.size(); ++i) {
+                newState.snake.push_back({snakeX[i].toInt(), snakeY[i].toInt()});
+            }
+            newState.direction = newState.nextDirection = static_cast<Direction>(object.value("direction").toInt());
+            newState.food = {object.value("foodX").toInt(), object.value("foodY").toInt()};
+            QJsonArray barriersX = object.value("barriersX").toArray();
+            QJsonArray barriersY = object.value("barriersY").toArray();
+            assert(barriersX.size() == barriersY.size());
+            for (int i = 0; i < barriersX.size(); ++i) {
+                newState.barriers.insert({barriersX[i].toInt(), barriersY[i].toInt()});
+            }
+            newState.growth = object.value("growth").toInt();
+            newState.speed = object.value("speed").toInt();
+            state = newState;
+            update();
+        } catch (std::exception &e) {
+            QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
+        }
+    } else {
+        QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
+    }
+}
+
+void Game::save() {
+    QFile file(QFileDialog::getSaveFileName(this, "Save", "game.json"));
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonObject json;
+        QJsonArray snakeX, snakeY;
+        for (const auto &point:state.snake) {
+            snakeX.push_back(point.x);
+            snakeY.push_back(point.y);
+        }
+        json.insert("snakeX", snakeX);
+        json.insert("snakeY", snakeY);
+        json.insert("direction", state.direction);
+        json.insert("foodX", state.food.x);
+        json.insert("foodY", state.food.y);
+        QJsonArray barriersX, barriersY;
+        for (const auto &point:state.barriers) {
+            barriersX.push_back(point.x);
+            barriersY.push_back(point.y);
+        }
+        json.insert("barriersX", barriersX);
+        json.insert("barriersY", barriersY);
+        json.insert("growth", state.growth);
+        json.insert("speed", state.speed);
+        QJsonDocument document;
+        document.setObject(json);
+        file.write(document.toJson(QJsonDocument::Compact));
+        file.close();
+    } else {
+        QMessageBox::critical(this, "critical", "File save failure.", QMessageBox::Yes, QMessageBox::Yes);
+    }
 }
 
 void Game::paintEvent(QPaintEvent *event) {
@@ -61,12 +126,6 @@ void Game::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_R:
             restart();
-            return;
-        case Qt::Key_S:
-            if (state.status == PAUSE) save();
-            return;
-        case Qt::Key_L:
-            if (state.status == NONE) load();
             return;
         default:
             break;
@@ -156,71 +215,7 @@ void Game::changeStatus(Status status) {
         }
         state.status = status;
     }
-}
-
-void Game::save() {
-    QFile file(QFileDialog::getSaveFileName(this, "Save", "game.json"));
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QJsonObject json;
-        QJsonArray snakeX, snakeY;
-        for (const auto &point:state.snake) {
-            snakeX.push_back(point.x);
-            snakeY.push_back(point.y);
-        }
-        json.insert("snakeX", snakeX);
-        json.insert("snakeY", snakeY);
-        json.insert("direction", state.direction);
-        json.insert("foodX", state.food.x);
-        json.insert("foodY", state.food.y);
-        QJsonArray barriersX, barriersY;
-        for (const auto &point:state.barriers) {
-            barriersX.push_back(point.x);
-            barriersY.push_back(point.y);
-        }
-        json.insert("barriersX", barriersX);
-        json.insert("barriersY", barriersY);
-        json.insert("growth", state.growth);
-        json.insert("speed", state.speed);
-        QJsonDocument document;
-        document.setObject(json);
-        file.write(document.toJson(QJsonDocument::Compact));
-        file.close();
-    } else {
-        QMessageBox::critical(this, "critical", "File save failure.", QMessageBox::Yes, QMessageBox::Yes);
-    }
-}
-
-void Game::load() {
-    QFile file(QFileDialog::getOpenFileName(this, "Open", "game.json"));
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        try {
-            GameState newState = defaultState;
-            QJsonDocument document = QJsonDocument::fromJson(file.readAll());
-            QJsonObject object = document.object();
-            QJsonArray snakeX = object.value("snakeX").toArray();
-            QJsonArray snakeY = object.value("snakeY").toArray();
-            assert(snakeX.size() == snakeY.size() && snakeX.size() >= 2);
-            for (int i = 0; i < snakeX.size(); ++i) {
-                newState.snake.push_back({snakeX[i].toInt(), snakeY[i].toInt()});
-            }
-            newState.direction = newState.nextDirection = static_cast<Direction>(object.value("direction").toInt());
-            newState.food = {object.value("foodX").toInt(), object.value("foodY").toInt()};
-            QJsonArray barriersX = object.value("barriersX").toArray();
-            QJsonArray barriersY = object.value("barriersY").toArray();
-            assert(barriersX.size() == barriersY.size());
-            for (int i = 0; i < barriersX.size(); ++i) {
-                newState.barriers.insert({barriersX[i].toInt(), barriersY[i].toInt()});
-            }
-            newState.growth = object.value("growth").toInt();
-            newState.speed = object.value("speed").toInt();
-            state = newState;
-            update();
-        } catch (std::exception &e) {
-            QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
-        }
-    } else {
-        QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
-    }
+    parent->refreshButtons(state.status);
 }
 
 Point Game::randomPoint(int left, int right, int top, int bottom) {
