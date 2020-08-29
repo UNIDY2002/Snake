@@ -42,7 +42,6 @@ void Game::load() {
             newState.speed = object.value("speed").toInt();
             newState.ticks = object.value("ticks").toInt();
             state = newState;
-            update();
             changeStatus(PAUSE);
         } catch (std::exception &e) {
             QMessageBox::critical(this, "critical", "File open failure.", QMessageBox::Yes, QMessageBox::Yes);
@@ -85,10 +84,13 @@ void Game::save() {
     }
 }
 
+void Game::exit() {
+    QApplication::closeAllWindows();
+}
+
 void Game::start() {
-    changeStatus(START);
     state.food = randomPoint();
-    update();
+    changeStatus(START);
 }
 
 void Game::pause() {
@@ -125,6 +127,13 @@ void Game::paintEvent(QPaintEvent *event) {
     painter.drawText(boardOccupation.x + 10,
                      boardOccupation.y + boardOccupation.boardSize - 10,
                      QString::number(state.ticks));
+
+    ui->load->setEnabled(state.status == NONE);
+    ui->save->setEnabled(state.status == PAUSE);
+    ui->start->setEnabled(state.status == NONE);
+    ui->pause->setEnabled(state.status == START);
+    ui->resume->setEnabled(state.status == PAUSE);
+    ui->restart->setEnabled(state.status == PAUSE || state.status == STOP);
 }
 
 void Game::resizeEvent(QResizeEvent *event) {
@@ -198,11 +207,11 @@ void Game::move() {
                 state.food = randomPoint();
             }
             ++state.ticks;
+            update();
         } else {
             changeStatus(STOP);
             timer->stop();
         }
-        update();
     }
 }
 
@@ -219,6 +228,7 @@ void Game::changeStatus(Status status) {
     if (status != state.status) {
         parent->refreshActions(state.status, status);
         state.status = status;
+        update();
     }
 }
 

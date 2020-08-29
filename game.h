@@ -29,9 +29,13 @@ public:
 
     ~Game() override;
 
+public slots:
+
     void load();
 
     void save();
+
+    static void exit();
 
     void start();
 

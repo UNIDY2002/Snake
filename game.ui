@@ -87,5 +87,48 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>load</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>load()</slot>
+  </connection>
+  <connection>
+   <sender>save</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>save()</slot>
+  </connection>
+  <connection>
+   <sender>exit</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>exit()</slot>
+  </connection>
+  <connection>
+   <sender>start</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>start()</slot>
+  </connection>
+  <connection>
+   <sender>pause</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>pause()</slot>
+  </connection>
+  <connection>
+   <sender>resume</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>resume()</slot>
+  </connection>
+  <connection>
+   <sender>restart</sender>
+   <signal>clicked()</signal>
+   <receiver>Game</receiver>
+   <slot>restart()</slot>
+  </connection>
+ </connections>
 </ui>

@@ -6,7 +6,7 @@ Window::Window(QWidget *parent) : QMainWindow(parent), ui(new Ui::Window) {
     setCentralWidget(game);
     connect(ui->load, &QAction::triggered, game, &Game::load);
     connect(ui->save, &QAction::triggered, game, &Game::save);
-    connect(ui->exit, &QAction::triggered, [=]() { QApplication::closeAllWindows(); });
+    connect(ui->exit, &QAction::triggered, game, &Game::exit);
     connect(ui->start, &QAction::triggered, game, &Game::start);
     connect(ui->pause, &QAction::triggered, game, &Game::pause);
     connect(ui->resume, &QAction::triggered, game, &Game::resume);
