@@ -1,5 +1,6 @@
 #include <QtWidgets/QMessageBox>
 #include <QCloseEvent>
+#include <utils.h>
 #include "window.h"
 
 Window::Window(QWidget *parent) : QMainWindow(parent), ui(new Ui::Window) {
@@ -10,13 +11,8 @@ Window::~Window() {
     delete ui;
 }
 
-void Window::refreshActions(Status original, Status status) {
-    ui->load->setEnabled(status == NONE);
-    ui->save->setEnabled(status == PAUSE);
-    ui->start->setEnabled(status == NONE);
-    ui->pause->setEnabled(status == START);
-    ui->resume->setEnabled(status == PAUSE);
-    ui->restart->setEnabled(status == PAUSE || status == STOP);
+void Window::refresh(Status original, Status status) {
+    UPDATE_ENABLED(status)
     switch (status) {
         case START:
             ui->statusbar->showMessage(original == NONE ? "Game starts." : "Game resumes.", 2400);

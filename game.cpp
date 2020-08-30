@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include "game.h"
+#include "utils.h"
 
 Game::Game(QWidget *parent) : QWidget(parent), timer(new QTimer(this)), ui(new Ui::Game) {
     timer->callOnTimeout([&]() { move(); });
@@ -110,7 +111,8 @@ void Game::restart() {
     if (timer->isActive()) timer->stop();
     state = defaultState;
     init();
-    update();
+    emit statusChanged(NONE, NONE);
+    emit update();
 }
 
 void Game::paintEvent(QPaintEvent *event) {
@@ -130,13 +132,7 @@ void Game::paintEvent(QPaintEvent *event) {
     painter.drawText(boardOccupation.x + 10,
                      boardOccupation.y + boardOccupation.boardSize - 10,
                      QString::number(state.ticks));
-
-    ui->load->setEnabled(state.status == NONE);
-    ui->save->setEnabled(state.status == PAUSE);
-    ui->start->setEnabled(state.status == NONE);
-    ui->pause->setEnabled(state.status == START);
-    ui->resume->setEnabled(state.status == PAUSE);
-    ui->restart->setEnabled(state.status == PAUSE || state.status == STOP);
+    UPDATE_ENABLED(state.status)
 }
 
 void Game::resizeEvent(QResizeEvent *event) {
@@ -182,7 +178,7 @@ void Game::mousePressEvent(QMouseEvent *event) {
         } else if (available({x, y})) {
             state.barriers.insert({x, y});
         }
-        update();
+        emit update();
     }
 }
 
@@ -209,7 +205,7 @@ void Game::move() {
                 state.food = randomPoint();
             }
             ++state.ticks;
-            update();
+            emit update();
         } else {
             changeStatus(STOP);
             timer->stop();
@@ -230,7 +226,7 @@ void Game::changeStatus(Status status) {
     if (status != state.status) {
         emit statusChanged(state.status, status);
         state.status = status;
-        update();
+        emit update();
     }
 }
 

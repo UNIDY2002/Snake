@@ -22,6 +22,6 @@ include_directories(.)
 
 qt5_add_resources(QRC_FILES resources.qrc)
 
-add_executable(Snake main.cpp game.cpp game.h constants.h types.h window.cpp window.h ${QRC_FILES})
+add_executable(Snake main.cpp game.cpp game.h constants.h types.h window.cpp window.h ${QRC_FILES} utils.h)
 
 target_link_libraries(Snake Qt5::Core Qt5::Gui Qt5::Multimedia Qt5::Widgets)

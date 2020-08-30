@@ -219,7 +219,7 @@
    <sender>game</sender>
    <signal>statusChanged(Status, Status)</signal>
    <receiver>Window</receiver>
-   <slot>refreshActions(Status, Status)</slot>
+   <slot>refresh(Status, Status)</slot>
   </connection>
  </connections>
 </ui>

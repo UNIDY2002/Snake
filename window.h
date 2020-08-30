@@ -18,7 +18,7 @@ public:
 
 public slots:
 
-    void refreshActions(Status original, Status status);
+    void refresh(Status original, Status status);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
