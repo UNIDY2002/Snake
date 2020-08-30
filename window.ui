@@ -17,6 +17,7 @@
    <iconset resource="resources.qrc">
     <normaloff>:/resources/windowIcon.svg</normaloff>:/resources/windowIcon.svg</iconset>
   </property>
+  <widget class="Game" name="game"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -80,6 +81,9 @@
    </property>
   </action>
   <action name="save">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/resources/save.svg</normaloff>:/resources/save.svg</iconset>
@@ -113,6 +117,9 @@
    </property>
   </action>
   <action name="pause">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/resources/pause.svg</normaloff>:/resources/pause.svg</iconset>
@@ -125,6 +132,9 @@
    </property>
   </action>
   <action name="resume">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/resources/resume.svg</normaloff>:/resources/resume.svg</iconset>
@@ -137,6 +147,9 @@
    </property>
   </action>
   <action name="restart">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/resources/restart.svg</normaloff>:/resources/restart.svg</iconset>
@@ -149,8 +162,64 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Game</class>
+   <extends>QWidget</extends>
+   <header>game.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>load</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>load()</slot>
+  </connection>
+  <connection>
+   <sender>save</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>save()</slot>
+  </connection>
+  <connection>
+   <sender>exit</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>exit()</slot>
+  </connection>
+  <connection>
+   <sender>start</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>start()</slot>
+  </connection>
+  <connection>
+   <sender>pause</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>pause()</slot>
+  </connection>
+  <connection>
+   <sender>resume</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>resume()</slot>
+  </connection>
+  <connection>
+   <sender>restart</sender>
+   <signal>triggered()</signal>
+   <receiver>game</receiver>
+   <slot>restart()</slot>
+  </connection>
+  <connection>
+   <sender>game</sender>
+   <signal>statusChanged(Status, Status)</signal>
+   <receiver>Window</receiver>
+   <slot>refreshActions(Status, Status)</slot>
+  </connection>
+ </connections>
 </ui>

@@ -9,7 +9,7 @@
 #include <QTimer>
 #include "game.h"
 
-Game::Game(Window *parent) : QWidget(parent), parent(parent), timer(new QTimer(this)), ui(new Ui::Game) {
+Game::Game(QWidget *parent) : QWidget(parent), timer(new QTimer(this)), ui(new Ui::Game) {
     timer->callOnTimeout([&]() { move(); });
     ui->setupUi(this);
     setFocus();
@@ -191,7 +191,6 @@ void Game::init() {
     state.direction = static_cast<Direction>(QRandomGenerator::global()->bounded(W, D + 1));
     state.snake.push_back({point.x + dx[state.direction], point.y + dy[state.direction]});
     state.snake.push_back(point);
-    parent->refreshActions(NONE, NONE);
 }
 
 void Game::move() {
@@ -229,7 +228,7 @@ bool Game::available(const Point &p) {
 
 void Game::changeStatus(Status status) {
     if (status != state.status) {
-        parent->refreshActions(state.status, status);
+        emit statusChanged(state.status, status);
         state.status = status;
         update();
     }

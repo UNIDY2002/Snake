@@ -4,15 +4,6 @@
 
 Window::Window(QWidget *parent) : QMainWindow(parent), ui(new Ui::Window) {
     ui->setupUi(this);
-    auto game = new Game(this);
-    setCentralWidget(game);
-    connect(ui->load, &QAction::triggered, game, &Game::load);
-    connect(ui->save, &QAction::triggered, game, &Game::save);
-    connect(ui->exit, &QAction::triggered, game, &Game::exit);
-    connect(ui->start, &QAction::triggered, game, &Game::start);
-    connect(ui->pause, &QAction::triggered, game, &Game::pause);
-    connect(ui->resume, &QAction::triggered, game, &Game::resume);
-    connect(ui->restart, &QAction::triggered, game, &Game::restart);
 }
 
 Window::~Window() {

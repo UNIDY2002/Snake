@@ -4,10 +4,7 @@
 #include <QtWidgets/QWidget>
 #include "constants.h"
 #include "types.h"
-#include "window.h"
 #include "ui_game.h"
-
-class Window;
 
 namespace Ui {
     class Game;
@@ -16,7 +13,7 @@ namespace Ui {
 class Game : public QWidget {
 Q_OBJECT
 public:
-    explicit Game(Window *parent = nullptr);
+    explicit Game(QWidget *parent = nullptr);
 
     ~Game() override;
 
@@ -36,6 +33,10 @@ public slots:
 
     void restart();
 
+signals:
+
+    void statusChanged(Status original, Status status);
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 
@@ -46,8 +47,6 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
 
 private:
-    Window *parent;
-
     QTimer *timer;
 
     Ui::Game *ui;

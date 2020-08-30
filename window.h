@@ -16,6 +16,8 @@ public:
 
     ~Window() override;
 
+public slots:
+
     void refreshActions(Status original, Status status);
 
 protected:
